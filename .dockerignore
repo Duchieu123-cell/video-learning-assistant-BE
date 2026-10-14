@@ -1,0 +1,14 @@
+.git
+.env
+.env.local
+.env.staging
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.coverage
+venv/
+.venv/
+.gitignore
+testing/

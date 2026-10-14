@@ -1,6 +1,13 @@
-.venv/
+.git
 .env
+.env.local
+.env.staging
 __pycache__/
 *.pyc
-.vscode/
+*.pyo
+*.pyd
+.pytest_cache/
+.coverage
+venv/
+.venv/
 testing/
