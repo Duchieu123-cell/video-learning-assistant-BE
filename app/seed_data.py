@@ -47,7 +47,7 @@ async def create_seed_data():
             lesson_1 = Lesson(
                 course_id=course.id,
                 title="Bài 1: useEffect và bài toán Memory Leak",
-                video_url=f"{settings.FRONTEND_VITE_URL}/src/video/test_video_1.mp4",
+                video_url="http://localhost:5173/src/video/test_video_1.mp4",
                 duration_seconds=360,
                 order_index=1
             )
@@ -55,7 +55,7 @@ async def create_seed_data():
             lesson_2 = Lesson(
                 course_id=course.id,
                 title="Bài 2: useState và bài toán State Management",
-                video_url=f"{settings.FRONTEND_VITE_URL}/src/video/test_video_2.mp4",
+                video_url="http://localhost:5173/src/video/test_video_2.mp4",
                 duration_seconds=360,
                 order_index=2
             )
@@ -63,7 +63,7 @@ async def create_seed_data():
             lesson_3 = Lesson(
                 course_id=course.id,
                 title="Bài 3: So sánh useMemo và useCallback khác nhau gì?",
-                video_url=f"{settings.FRONTEND_VITE_URL}/src/video/test_video_3.mp4",
+                video_url="http://localhost:5173/src/video/test_video_3.mp4",
                 duration_seconds=360,
                 order_index=3
             )
@@ -72,7 +72,7 @@ async def create_seed_data():
             lesson_4 = Lesson(
                 course_id=course.id,
                 title="Bài 4: useRef() hook | Cách sử dụng useRef() hook",
-                video_url=f"{settings.FRONTEND_VITE_URL}/src/video/test_video_4.mp4",
+                video_url="http://localhost:5173/src/video/test_video_4.mp4",
                 duration_seconds=360,
                 order_index=4
             )
