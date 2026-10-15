@@ -31,8 +31,8 @@ class LessonChunk(Base):
     start_seconds: Mapped[int | None] = mapped_column(Integer, nullable=True)
     end_seconds: Mapped[int | None] = mapped_column(Integer, nullable=True)
     
-    # Vector embedding 384 chiều (chuẩn all-MiniLM-L6-v2)
-    embedding: Mapped[list[float]] = mapped_column(Vector(384), nullable=False)
+    # Vector embedding 1536 chiều
+    embedding: Mapped[list[float]] = mapped_column(Vector(1536), nullable=False)
     
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), 

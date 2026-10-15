@@ -9,8 +9,7 @@ from app.seed_data import create_seed_data
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    print("🚀 Ứng dụng đang khởi động...")
-    # await create_seed_data()
+    await create_seed_data()
         
     yield
     print("🛑 Ứng dụng đang tắt...")
@@ -18,7 +17,6 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="E-Learning AI Assistant",
     lifespan=lifespan,
-    version="1.0.0",
 )
 
 app.add_middleware(

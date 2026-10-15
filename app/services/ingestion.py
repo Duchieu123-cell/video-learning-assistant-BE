@@ -20,9 +20,13 @@ async def ingest_lesson_transcript(
     if not chunks_data:
         return 0
 
-    # 2. Tạo embeddings theo batch
+    # 2. Lọc các chunk không hợp lệ và tạo embeddings theo batch
+    chunks_data = [c for c in chunks_data if c.content.strip()]
+    if not chunks_data:
+        return 0
+
     texts = [c.content for c in chunks_data]
-    embeddings = get_embeddings_batch(texts)
+    embeddings = await get_embeddings_batch(texts)
 
     # 3. Tạo các bản ghi LessonChunk
     db_chunks = []

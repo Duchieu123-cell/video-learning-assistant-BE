@@ -20,7 +20,7 @@ async def retrieve_relevant_chunks(
     3. Join với bảng Lesson để lấy tiêu đề bài học tương ứng.
     """
     # 1. Tạo embedding câu hỏi (384 chiều)
-    query_vector = get_embedding(query_text)
+    query_vector = await get_embedding(query_text)
 
     # 2. Xây dựng query với pgvector cosine distance: embedding <=> query_vector
     # Độ tương đồng cosine similarity = 1 - cosine_distance
