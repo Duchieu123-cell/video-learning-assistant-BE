@@ -1,8 +1,8 @@
-"""initial tables
+"""initial
 
-Revision ID: 28d089d8f8df
+Revision ID: 2d20e7b22a6b
 Revises: 
-Create Date: 2026-10-15 16:07:38.772712
+Create Date: 2026-10-15 16:49:23.080576
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 import pgvector.sqlalchemy
 
 # revision identifiers, used by Alembic.
-revision: str = '28d089d8f8df'
+revision: str = '2d20e7b22a6b'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -85,7 +85,7 @@ def upgrade() -> None:
     sa.Column('content', sa.Text(), nullable=False),
     sa.Column('start_seconds', sa.Integer(), nullable=True),
     sa.Column('end_seconds', sa.Integer(), nullable=True),
-    sa.Column('embedding', pgvector.sqlalchemy.vector.VECTOR(dim=1536), nullable=False),
+    sa.Column('embedding', pgvector.sqlalchemy.vector.VECTOR(dim=768), nullable=False),
     sa.Column('created_at', sa.DateTime(timezone=True), nullable=False),
     sa.ForeignKeyConstraint(['course_id'], ['courses.id'], ondelete='CASCADE'),
     sa.ForeignKeyConstraint(['lesson_id'], ['lessons.id'], ondelete='CASCADE'),

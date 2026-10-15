@@ -12,15 +12,17 @@ async def retrieve_relevant_chunks(
     course_id: uuid.UUID,
     query_text: str,
     top_k: int = 3,
-    similarity_threshold: float = 0.35,  # Loại bỏ các đoạn context quá xa lạ với câu hỏi
+    similarity_threshold: float = 0.55,  # Nâng nhẹ ngưỡng cho phù hợp với gemini-embedding-001
 ) -> list[RetrievedChunk]:
     """
-    1. Tạo vector embedding cho câu hỏi.
+    1. Tạo vector embedding cho câu hỏi (768 chiều).
     2. Truy vấn Cosine Distance trên PostgreSQL trong phạm vi course_id.
     3. Join với bảng Lesson để lấy tiêu đề bài học tương ứng.
     """
-    # 1. Tạo embedding câu hỏi (384 chiều)
+    # 1. Tạo embedding câu hỏi (768 chiều)
     query_vector = await get_embedding(query_text)
+    if not query_vector:
+        return []
 
     # 2. Xây dựng query với pgvector cosine distance: embedding <=> query_vector
     # Độ tương đồng cosine similarity = 1 - cosine_distance
@@ -42,7 +44,7 @@ async def retrieve_relevant_chunks(
         .order_by(cosine_distance.asc())
         .limit(top_k)
     )
-    
+
     result = await db.execute(stmt)
     rows = result.all()
 
