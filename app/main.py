@@ -9,7 +9,7 @@ from app.seed_data import create_seed_data
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # await create_seed_data()
+    await create_seed_data()
         
     yield
     print("🛑 Ứng dụng đang tắt...")
@@ -22,7 +22,8 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:5173"
+        "http://localhost:5173",
+        "https://video-learning-assistant-fe.vercel.app/"
     ],
     allow_credentials=True,
     allow_methods=["*"],
