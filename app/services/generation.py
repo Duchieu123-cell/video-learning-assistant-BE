@@ -7,6 +7,8 @@ from app.schemas.rag import RetrievedChunk
 from sqlalchemy.ext.asyncio import AsyncSession
 import uuid
 from app.models.rag import ChatHistory
+import re
+import asyncio
 
 client = genai.Client(api_key=settings.GEMINI_API_KEY)
 
@@ -69,8 +71,20 @@ async def generate_rag_stream(
         ):
             if chunk.text:
                 accumulated_response.append(chunk.text)
-                payload = json.dumps({"type": "token", "data": chunk.text}, ensure_ascii=False)
-                yield f"data: {payload}\n\n"
+                # Tách chuỗi thành các từ kèm theo khoảng trắng/xuống dòng phía sau nó
+                # Ví dụ: "Xin chào \nban" -> ["Xin ", "chào \n", "ban"]
+                tokens = re.findall(r'\S+\s*|\s+', chunk.text)
+                
+                # Gom 1 đến 2 từ mỗi lần gửi (step = 2)
+                words_per_yield = 2
+                for i in range(0, len(tokens), words_per_yield):
+                    sub_chunk = "".join(tokens[i : i + words_per_yield])
+                    payload = json.dumps({"type": "token", "data": sub_chunk}, ensure_ascii=False)
+                    yield f"data: {payload}\n\n"
+                    
+                    # Tạo độ trễ nhỏ (15ms - 25ms) để ép ASGI server (Uvicorn) 
+                    # đẩy gói tin đi ngay lập tức và tạo hiệu ứng gõ chữ mượt mắt
+                    await asyncio.sleep(0.02)
 
         chat_response_content = ("").join(accumulated_response)
 
