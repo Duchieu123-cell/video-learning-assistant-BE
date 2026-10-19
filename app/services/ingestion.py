@@ -1,5 +1,4 @@
 import uuid
-import logging
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.rag import LessonChunk
 from app.services.chunking import TranscriptSegment, chunk_transcript
@@ -7,7 +6,6 @@ from app.services.embedding import get_embeddings_batch
 from app.services.transcription import transcribe_cloudinary_video
 from app.core.database import AsyncSessionLocal
 
-logger = logging.getLogger(__name__)
 
 async def ingest_lesson_transcript(
     db: AsyncSession,
@@ -58,11 +56,11 @@ async def process_video_rag(
     Tự động bóc tách phụ đề từ link Cloudinary và nạp vector vào DB.
     """
     try:
-        logger.info(f"🎙️ Bắt đầu trích xuất phụ đề cho bài học {lesson_id}...")
+        print(f"Bắt đầu trích xuất phụ đề cho bài học {lesson_id}...")
         segments = await transcribe_cloudinary_video(video_url)
 
         if not segments:
-            logger.warning(f"Không tìm thấy lời thoại nào trong video của bài học {lesson_id}")
+            print(f"Không tìm thấy lời thoại nào trong video của bài học {lesson_id}")
             return
 
         async with AsyncSessionLocal() as db:
@@ -72,8 +70,8 @@ async def process_video_rag(
                 lesson_id=lesson_id,
                 segments=segments,
             )
-            logger.info(f"Đã xử lý xong bài học {lesson_id}: {chunks_count} vector chunks đã được lưu!")
+            print(f"Đã xử lý xong bài học {lesson_id}: {chunks_count} vector chunks đã được lưu")
             await db.close()
 
     except Exception as e:
-        logger.error(f"Lỗi khi xử lý RAG ngầm cho bài học {lesson_id}: {str(e)}")
+        print(f"Lỗi khi xử lý RAG ngầm cho bài học {lesson_id}: {str(e)}")

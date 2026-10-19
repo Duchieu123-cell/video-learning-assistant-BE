@@ -1,4 +1,3 @@
-import re
 import httpx
 from groq import AsyncGroq
 from app.core.config import settings
@@ -9,13 +8,10 @@ groq_client = AsyncGroq(api_key=settings.GROQ_API_KEY)
 
 def convert_cloudinary_video_to_audio_url(video_url: str) -> str:
     """
-    Chuyển đổi URL video Cloudinary (.mp4, .mov, .webm) sang URL audio (.mp3)
-    kèm tham số nén bitrate 32k (br_32k) để file siêu nhẹ (< 10MB cho 30 phút).
+    Chuyển đổi URL video Cloudinary (.mp4) sang URL audio (.mp3)
+    với tham số nén bitrate 32k (br_32k) để file siêu nhẹ (< 10MB cho 30 phút).
     """
-    audio_url = re.sub(r"\.(mp4|mov|mkv|webm|avi)(\?.*)?$", ".mp3", video_url, flags=re.IGNORECASE)
-
-    if "/video/upload/" in audio_url:
-        audio_url = audio_url.replace("/video/upload/", "/video/upload/br_32k/")
+    audio_url = video_url.replace(".mp4", ".mp3").replace("/video/upload/", "/video/upload/br_32k/")
 
     return audio_url
 
@@ -35,7 +31,7 @@ async def transcribe_cloudinary_video(video_url: str) -> list[TranscriptSegment]
     transcription = await groq_client.audio.transcriptions.create(
         file=("lesson_audio.mp3", audio_bytes),
         model="whisper-large-v3-turbo",
-        response_format="verbose_json",  # Bắt buộc để có danh sách segments kèm timestamp
+        response_format="verbose_json",
         temperature=0.0,
     )
 
