@@ -12,3 +12,4 @@ venv/
 .venv/
 .gitignore
 test_retrieval.py
+test_groq_transcription.py

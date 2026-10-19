@@ -11,3 +11,4 @@ __pycache__/
 venv/
 .venv/
 test_retrieval.py
+test_groq_transcription.py

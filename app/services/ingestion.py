@@ -1,9 +1,13 @@
 import uuid
+import logging
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.rag import LessonChunk
 from app.services.chunking import TranscriptSegment, chunk_transcript
 from app.services.embedding import get_embeddings_batch
+from app.services.transcription import transcribe_cloudinary_video
+from app.core.database import AsyncSessionLocal
 
+logger = logging.getLogger(__name__)
 
 async def ingest_lesson_transcript(
     db: AsyncSession,
@@ -28,7 +32,6 @@ async def ingest_lesson_transcript(
     texts = [c.content for c in chunks_data]
     embeddings = await get_embeddings_batch(texts)
 
-    # 3. Tạo các bản ghi LessonChunk
     db_chunks = []
     for chunk, emb in zip(chunks_data, embeddings):
         db_chunk = LessonChunk(
@@ -41,8 +44,36 @@ async def ingest_lesson_transcript(
         )
         db_chunks.append(db_chunk)
 
-    # 4. Lưu vào cơ sở dữ liệu
     db.add_all(db_chunks)
     await db.commit()
 
     return len(db_chunks)
+
+async def process_video_rag(
+    course_id: uuid.UUID,
+    lesson_id: uuid.UUID,
+    video_url: str,
+):
+    """:
+    Tự động bóc tách phụ đề từ link Cloudinary và nạp vector vào DB.
+    """
+    try:
+        logger.info(f"🎙️ Bắt đầu trích xuất phụ đề cho bài học {lesson_id}...")
+        segments = await transcribe_cloudinary_video(video_url)
+
+        if not segments:
+            logger.warning(f"Không tìm thấy lời thoại nào trong video của bài học {lesson_id}")
+            return
+
+        async with AsyncSessionLocal() as db:
+            chunks_count = await ingest_lesson_transcript(
+                db=db,
+                course_id=course_id,
+                lesson_id=lesson_id,
+                segments=segments,
+            )
+            logger.info(f"Đã xử lý xong bài học {lesson_id}: {chunks_count} vector chunks đã được lưu!")
+            await db.close()
+
+    except Exception as e:
+        logger.error(f"Lỗi khi xử lý RAG ngầm cho bài học {lesson_id}: {str(e)}")

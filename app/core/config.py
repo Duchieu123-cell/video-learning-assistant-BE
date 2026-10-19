@@ -7,6 +7,7 @@ class Settings(BaseSettings):
     ENVIRONMENT: str
     DATABASE_URL: str
     GEMINI_API_KEY: str
+    GROQ_API_KEY: str
     SECRET_KEY: str
     
     ALGORITHM: str = "HS256"
