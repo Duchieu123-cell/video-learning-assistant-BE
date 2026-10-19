@@ -1,15 +1,8 @@
-.git
+.venv/
 .env
-.env.local
-.env.staging
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
-.pytest_cache/
-.coverage
-venv/
-.venv/
 .gitignore
-test_retrieval.py
-test_groq_transcription.py
+test_*.py
