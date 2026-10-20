@@ -1,10 +1,12 @@
 import uuid
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.rag import LessonChunk
+from app.models.course import Lesson
 from app.services.chunking import TranscriptSegment, chunk_transcript
 from app.services.embedding import get_embeddings_batch
 from app.services.transcription import transcribe_cloudinary_video
 from app.core.database import AsyncSessionLocal
+from sqlalchemy import update
 
 
 async def ingest_lesson_transcript(
@@ -57,13 +59,21 @@ async def process_video_rag(
     """
     try:
         print(f"Bắt đầu trích xuất phụ đề cho bài học {lesson_id}...")
-        segments = await transcribe_cloudinary_video(video_url)
+        segments, duration_seconds = await transcribe_cloudinary_video(video_url)
 
         if not segments:
             print(f"Không tìm thấy lời thoại nào trong video của bài học {lesson_id}")
             return
 
         async with AsyncSessionLocal() as db:
+            stmt = (
+                update(Lesson)
+                .where(Lesson.id == lesson_id)
+                .values(duration_seconds=duration_seconds)
+            )
+            await db.execute(stmt)
+            await db.commit()
+            
             chunks_count = await ingest_lesson_transcript(
                 db=db,
                 course_id=course_id,

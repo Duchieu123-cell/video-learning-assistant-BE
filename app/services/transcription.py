@@ -16,7 +16,7 @@ def convert_cloudinary_video_to_audio_url(video_url: str) -> str:
     return audio_url
 
 
-async def transcribe_cloudinary_video(video_url: str) -> list[TranscriptSegment]:
+async def transcribe_cloudinary_video(video_url: str) -> tuple[list[TranscriptSegment], int]:
     """
     Tải file audio đã được Cloudinary chuyển đổi và gửi sang Groq Whisper API
     để nhận về danh sách câu thoại kèm start_seconds, end_seconds.
@@ -54,5 +54,14 @@ async def transcribe_cloudinary_video(video_url: str) -> list[TranscriptSegment]
                     text=clean_text,
                 )
             )
+            
+    duration_seconds = getattr(transcription, "duration", None)
+    
+    if duration_seconds is not None:
+        duration_seconds = int(round(float(duration_seconds)))
+    elif segments:
+        duration_seconds = segments[-1].end
+    else:
+        duration_seconds = 0 
 
-    return segments
+    return segments, duration_seconds
