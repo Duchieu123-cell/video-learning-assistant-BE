@@ -1,9 +1,10 @@
-from fastapi import APIRouter, Depends, Response, Cookie, HTTPException, status
+from fastapi import APIRouter, Depends, Response, Cookie, status
 from fastapi.security import OAuth2PasswordRequestForm
 from app.core.dependencies import DBSession
 from typing import Annotated
 from app.services.auth import AuthService
 from app.schemas import auth
+from app.core.exceptions import UnauthorizedException
 
 router = APIRouter(
     prefix="/auth",
@@ -31,14 +32,9 @@ async def refresh_access_token(
     response: Response,
     db: DBSession,
     refresh_token: Annotated[str | None, Cookie()] = None,
-
 ):
     if not refresh_token:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Không tìm thấy Refresh Token",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+        raise UnauthorizedException("Không tìm thấy Refresh Token")
         
     return await AuthService.refresh_access_token(response, refresh_token, db)
 
@@ -53,10 +49,6 @@ async def logout_user(
     refresh_token: Annotated[str | None, Cookie()] = None,
 ):
     if not refresh_token:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Không tìm thấy Refresh token",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+        raise UnauthorizedException("Không tìm thấy Refresh token")
         
     return await AuthService.logout_user(response, refresh_token, db)

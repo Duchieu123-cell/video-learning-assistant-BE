@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, status, Path
+from fastapi import APIRouter, Path
 from fastapi.responses import StreamingResponse
 from app.core.dependencies import DBSession, CurrentUser
 from app.schemas.chat import ChatStreamRequest, ChatMessageResponse
@@ -7,6 +7,7 @@ from app.services.generation import generate_rag_stream
 from typing import Annotated
 import uuid
 from app.services.history import get_chat_history
+from app.core.exceptions import BadRequestException
 
 router = APIRouter(
     prefix="/chat",
@@ -21,10 +22,7 @@ async def stream_chat_response(
     db: DBSession
 ):
     if not req.query.strip():
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Câu hỏi không được để trống"
-        )
+        raise BadRequestException("Câu hỏi không được để trống")
 
     chunks = await retrieve_relevant_chunks(
         db=db,
