@@ -1,8 +1,9 @@
 import uuid
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter
 from app.schemas.course import CourseDetailResponse, CourseListItem
 from app.services.courses import CourseService
 from app.core.dependencies import DBSession
+from app.core.exceptions import CourseNotFoundException
 
 router = APIRouter(
     prefix="/courses", 
@@ -22,9 +23,6 @@ async def get_course_detail(course_id: uuid.UUID, db: DBSession):
     course = await CourseService.get_course_detail(course_id, db)
 
     if not course:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Không tìm thấy khóa học"
-        )
+        raise CourseNotFoundException()
 
     return course
